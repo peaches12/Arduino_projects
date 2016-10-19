@@ -1,16 +1,15 @@
-
 /*
- * Tutorial 3b: LED Knight Rider
+ * Tutorial 3c: LED Knight Rider
  * 
- * Demonstrates the use of a for() loop.
- * Lights multiple LEDs in sequence, then in reverse.
+ * Turns on a series of LEDs based on the value of an analog sensor.
+ * This is a simple way to make a bar graph display. Though this graph
+ * uses 6 LEDs, you can use any number by changing the LED count
+ * and the pins in the array.
  *
  * The circuit:
  *  - 6 LEDs attached to digital pins 2 through 7 with 330ohm resistors
  *
- * created 2006
- * by David A. Mellis
- * modified 30 Aug 2011
+ * created 4 Sep 2010
  * by Tom Igoe
  * modified 14 August 2013
  * by Blaise Jarrett
@@ -18,45 +17,47 @@
  * This example code is in the public domain.
  *
  * Derivative work from:
- * http://www.arduino.cc/en/Tutorial/ForLoop
+ * http://www.arduino.cc/en/Tutorial/BarGraph
  *
  */
 
-// The time in ms each LED stays on for
-// experiment with this number, the lower the number
-// the faster the LEDs change
-int timer = 100;
+// the pin that the potentiometer is attached to
+int potPin = A0;
+// an array of pin numbers to which LEDs are attached
+// to add more LEDs just list them here in this array
+int ledPins[] = {2, 3, 4, 5, 6, 7};
+// the number of LEDs in the bar graph
+int ledCount = sizeof(ledPins) / sizeof(ledPins[0]);
 
 void setup()
 {
     // use a for loop to initialize each pin as an output
-    for (int thisPin = 2; thisPin < 8; thisPin++)
+    for (int thisLed = 0; thisLed < ledCount; thisLed++)
     {
-        pinMode(thisPin, OUTPUT);
+        pinMode(ledPins[thisLed], OUTPUT);
     }
 }
 
 void loop()
 {
-    // loop from the lowest pin to the highest
-    for (int thisPin = 2; thisPin < 8; thisPin++)
-    {
-        // turn the pin on
-        digitalWrite(thisPin, HIGH);
-        // wait to turn it off so we can see it
-        delay(timer);
-        // turn the pin off
-        digitalWrite(thisPin, LOW);
-    }
+    // read the potentiometer
+    int potReading = analogRead(potPin);
+    // map the result to a range from 0 to the number of LEDs
+    int ledLevel = map(potReading, 0, 1023, 0, ledCount);
 
-    // loop from the highest pin to the lowest
-    for (int thisPin = 7; thisPin > 1; thisPin--)
+    // loop over the LED array:
+    for (int thisLed = 0; thisLed < ledCount; thisLed++)
     {
-        // turn the pin on
-        digitalWrite(thisPin, HIGH);
-        // wait to turn it off so we can see it
-        delay(timer);
-        // turn the pin off
-        digitalWrite(thisPin, LOW);
+        // if the array element's index is less than ledLevel
+        // turn the pin for this element on
+        if (thisLed < ledLevel)
+        {
+            digitalWrite(ledPins[thisLed], HIGH);
+        }
+        // turn off all pins higher than the ledLevel
+        else
+        {
+            digitalWrite(ledPins[thisLed], LOW);
+        }
     }
 }
