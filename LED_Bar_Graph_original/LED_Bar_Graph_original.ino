@@ -22,7 +22,7 @@
  */
 
 // the pin that the potentiometer is attached to
-int signal = 1;
+int signall = 1;
 int potPin = A0;
 float timepassed = 0.0;
 // an array of pin numbers to which LEDs are attached
@@ -31,6 +31,7 @@ int ledPins[] = {2, 3, 4, 5, 6, 7};
 // the number of LEDs in the bar graph
 int ledCount = sizeof(ledPins) / sizeof(ledPins[0]);
 
+
 void setup()
 {
     // use a for loop to initialize each pin as an output
@@ -38,6 +39,7 @@ void setup()
     {
         pinMode(ledPins[thisLed], OUTPUT);
     }
+    Serial.begin(9600);
     Serial.println("hi");
 }
 
@@ -56,31 +58,29 @@ void loop()
         if (thisLed < ledLevel)
         {
             Serial.println("LED IS ON");
-            if (signal == 1)
+            if (signall == 1)
             {
                 if (timepassed < 2)
                 {
                     digitalWrite(ledPins[thisLed], HIGH);
-                    timepassed = timepassed + 0.1;
-                    Serial.println(timepassed);
+                    timepassed = timepassed + 0.2;
                 }
                 else if (timepassed >= 2)
                 {
-                    signal = 0;
+                    signall = 0;
                     timepassed = 0.0;
                 }
             }
-            else if (signal == 0)
+            else if (signall == 0)
             {
                 if (timepassed < 1.5)
                 {
                     digitalWrite(ledPins[thisLed], LOW);
-                    timepassed = timepassed + 0.1;
-                    Serial.println(timepassed);
+                    timepassed = timepassed + 0.2;
                 }
                 else if (timepassed >= 2);
                 {
-                    signal = 1;
+                    signall = 1;
                     timepassed = 0.0;
                 }
             }
