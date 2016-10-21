@@ -22,7 +22,9 @@
  */
 
 // the pin that the potentiometer is attached to
+int signal = 1;
 int potPin = A0;
+float timepassed = 0.0;
 // an array of pin numbers to which LEDs are attached
 // to add more LEDs just list them here in this array
 int ledPins[] = {2, 3, 4, 5, 6, 7};
@@ -36,6 +38,7 @@ void setup()
     {
         pinMode(ledPins[thisLed], OUTPUT);
     }
+    Serial.println("hi");
 }
 
 void loop()
@@ -44,7 +47,7 @@ void loop()
     int potReading = analogRead(potPin);
     // map the result to a range from 0 to the number of LEDs
     int ledLevel = map(potReading, 0, 1023, 0, ledCount);
-
+    Serial.println(ledLevel);
     // loop over the LED array:
     for (int thisLed = 0; thisLed < ledCount; thisLed++)
     {
@@ -52,12 +55,43 @@ void loop()
         // turn the pin for this element on
         if (thisLed < ledLevel)
         {
-            digitalWrite(ledPins[thisLed], HIGH);
+            Serial.println("LED IS ON");
+            if (signal == 1)
+            {
+                if (timepassed < 2)
+                {
+                    digitalWrite(ledPins[thisLed], HIGH);
+                    timepassed = timepassed + 0.1;
+                    Serial.println(timepassed);
+                }
+                else if (timepassed >= 2)
+                {
+                    signal = 0;
+                    timepassed = 0.0;
+                }
+            }
+            else if (signal == 0)
+            {
+                if (timepassed < 1.5)
+                {
+                    digitalWrite(ledPins[thisLed], LOW);
+                    timepassed = timepassed + 0.1;
+                    Serial.println(timepassed);
+                }
+                else if (timepassed >= 2);
+                {
+                    signal = 1;
+                    timepassed = 0.0;
+                }
+            }
+                
         }
         // turn off all pins higher than the ledLevel
         else
         {
             digitalWrite(ledPins[thisLed], LOW);
         }
+        
     }
+
 }
