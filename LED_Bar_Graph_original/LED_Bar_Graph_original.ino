@@ -24,63 +24,72 @@ void setup()
 
 void loop()
 {
-    int signall;
-    int timepassed;
-    static int signall_array;
-    static int time_array;
-    //signal array
-    signall_array[8] = {[0 ... 7] = 1}; //everything in this array is 1
-    time_array[8] = {[0 ... 7] = 0}; //everything here is 0
+    
+    static int signall;
+    static int timepassed;
+    static int signall_array[8];
+    static int time_array[8];
+    //everything in signall_array = 1
+    for (int y = 0; y < 8; y++)
+    {
+        signall_array[y] = 1;
+    }
+    //everything in time_array = 0
+    for (int k = 0; k < 8; k++)
+    {
+        time_array[k] = 0;
+    }
+
     
     // read the potentiometer
     int potReading = analogRead(potPin);
     // map the result to a range from 0 to the number of LEDs
     int ledLevel = map(potReading, 0, 1023, 0, ledCount);
-    // loop over the LED array:
+    // this blinks all the ON LEDS simultaneously
     for (int thisLed = 0; thisLed < ledCount; thisLed++)
     {
         if (thisLed < ledLevel)
         {
             signall = signall_array[thisLed]; //signall 1--that led is on, signall 0--that led is off
             timepassed = time_array[thisLed];
+            //aka the ON part of the blinking
             if (signall == 1) 
             {
-                if (timepassed < 15)
+                if (timepassed < 10)
                 {
                     digitalWrite(ledPins[thisLed], HIGH);
-                    timepassed++; //timepassed increases by 1
+                    timepassed = timepassed + 1; //timepassed increases by 1
+                    time_array[thisLed] = timepassed;
+                    Serial.println(timepassed);
                 }
                 else
                 {
                     signall = 0;
                     timepassed = 0;
                 }
-                Serial.println("LED is: ");
-                Serial.print(thisLed);
-                Serial.println("Timepassed is: ");
-                Serial.print(timepassed);
             }
+            //aka the OFF part of the blinking
             else
             {
-                if (timepassed < 15)
+                if (timepassed < 10)
                 {
                     digitalWrite(ledPins[thisLed], LOW);
                     timepassed++; //timepassed increases by 1
+                    time_array[thisLed] = timepassed;
                 }
                 else
                 {
                     signall = 1;
                     timepassed = 0;
                 }
-            }
-                
+            }                
         }
         // turn off all pins higher than the ledLevel
         else
         {
             digitalWrite(ledPins[thisLed], LOW);
         }
-        
+             
     }
 
 }
