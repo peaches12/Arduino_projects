@@ -24,16 +24,14 @@ void setup()
 
 void loop()
 {
-    static int signall;
-    static int timepassed;
-    //time factors
-    static int yone = 1, ytwo = 1, rone = 1, rtwo = 1, gone = 1, gtwo = 1, bone = 1, btwo = 1;
-    //signal factors
-    static int sigyo = 1, sigyt = 1, sigro = 1, sigrt = 1, siggo = 1, siggt = 1, sigbo = 1, sigbt = 1;
-
-    static int siglist[8] = {sigyo, sigyt, sigro, sigrt, siggo, siggt, sigbo, sigbt};
-
-    static int timelist[8] = {yone, ytwo, rone, rtwo, gone, gtwo, bone, btwo};
+    int signall;
+    int timepassed;
+    static int signall_array;
+    static int time_array;
+    //signal array
+    signall_array[8] = {[0 ... 7] = 1}; //everything in this array is 1
+    time_array[8] = {[0 ... 7] = 0}; //everything here is 0
+    
     // read the potentiometer
     int potReading = analogRead(potPin);
     // map the result to a range from 0 to the number of LEDs
@@ -43,8 +41,8 @@ void loop()
     {
         if (thisLed < ledLevel)
         {
-            signall = siglist[thisLed]; //signal 1--that led is on, signal 0--that led is off
-            timepassed = timelist[thisLed];
+            signall = signall_array[thisLed]; //signall 1--that led is on, signall 0--that led is off
+            timepassed = time_array[thisLed];
             if (signall == 1) 
             {
                 if (timepassed < 15)
@@ -56,8 +54,11 @@ void loop()
                 {
                     signall = 0;
                     timepassed = 0;
-                } 
-                Serial.println(timepassed);
+                }
+                Serial.println("LED is: ");
+                Serial.print(thisLed);
+                Serial.println("Timepassed is: ");
+                Serial.print(timepassed);
             }
             else
             {
