@@ -47,6 +47,8 @@ void setup()
         digitalWrite(Led_list[k], LOW); //all LEDS off at first
     }
     pinMode(btnPin, INPUT_PULLUP);
+    pinMode(echoPin, INPUT);
+    pinMode(trigPin, OUTPUT);
     
 }
 
@@ -79,7 +81,8 @@ void loop()
     }
     else //aka if btn is pushed
     {
-        int distance_cm, pulseLenMS, distance, time_delay, LED_delay;
+        int distance_cm, pulseLenMS, distance, LED_delay;
+        float time_delay_secs, time_delay_ft;
         //find distance in cm.
         digitalWrite(trigPin, LOW);
         delayMicroseconds(20);
@@ -96,17 +99,19 @@ void loop()
         
         Serial.print("Distance: "); //print distance
         Serial.println(distance);
-        time_delay = distance/7; //calculate 'time'
-        LED_delay = time_delay/LEDSLIGHT;
+        time_delay_ft = distance/7 * 30; //calculate 'time'
+        time_delay_secs = (time_delay_ft/2500) * 1000; //speed of a bullet in Milliseconds
+        LED_delay = time_delay_secs/LEDSLIGHT;
         Serial.print("Time to hit: "); //print time
-        Serial.println(time_delay);
-        for(int z = LEDSLIGHT; z > 0; z--)
+        Serial.println(time_delay_secs);
+        delay(time_delay_secs);
+        /* for(int z = LEDSLIGHT; z > 0; z--)
         {
             int LoopLED;
             LoopLED = Led_list[z];
             digitalWrite(LoopLED, LOW);
             delay(LED_delay);
-        }
-        Serial.println("TARGET HIT!");
+        }*/
+        Serial.println("TARGET HIT!"); 
     }
 }
