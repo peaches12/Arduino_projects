@@ -36,6 +36,7 @@ Servo MYSERVO;
 int echoPin = 7;
 int trigPin = 8;
  
+const int Interval[3] = {3, 2, 1};
 void setup() 
 {
     Serial.begin(9600); //monitor control
@@ -61,7 +62,6 @@ void loop()
     {
         int potValue, position;
         potValue = analogRead(Potpin);
-        Serial.println(potValue);
         position = map(potValue, 0, 1023, 0, 179);
         MYSERVO.write(position);
         LEDSLIGHT = map(position, 0, 179, 0, 7); //sort of like a bar graph with LEDS
@@ -81,8 +81,8 @@ void loop()
     }
     else //aka if btn is pushed
     {
-        int distance_cm, pulseLenMS, distance, LED_delay;
-        float time_delay_secs, time_delay_ft;
+        int distance_ft, pulseLenMS, LED_delay, countdown_time;
+        float seconds, milliseconds;
         //find distance in cm.
         digitalWrite(trigPin, LOW);
         delayMicroseconds(20);
@@ -92,26 +92,15 @@ void loop()
         
         pulseLenMS = pulseIn(echoPin, HIGH);
         
-        distance_cm = pulseLenMS/29.387/2;
-        
-        Serial.println(distance_cm);
-        distance = distance_cm * 10;
-        
-        Serial.print("Distance: "); //print distance
-        Serial.println(distance);
-        time_delay_ft = distance/7 * 30; //calculate 'time'
-        time_delay_secs = (time_delay_ft/2500) * 1000; //speed of a bullet in Milliseconds
-        LED_delay = time_delay_secs/LEDSLIGHT;
+        distance_ft = pulseLenMS/29.387/2; //raw measurement in cm.--in this program cm=ft
+        seconds = distance_ft/10; //converting ft. to seconds 
+        milliseconds = seconds*1000; //converting secs. to millisecs.
+        Serial.print("Distance: ");
+        Serial.println(distance_ft);
         Serial.print("Time to hit: "); //print time
-        Serial.println(time_delay_secs);
-        delay(time_delay_secs);
-        /* for(int z = LEDSLIGHT; z > 0; z--)
-        {
-            int LoopLED;
-            LoopLED = Led_list[z];
-            digitalWrite(LoopLED, LOW);
-            delay(LED_delay);
-        }*/
+        Serial.print(seconds);
+        Serial.println(" seconds.");
+        delay(seconds);
         Serial.println("TARGET HIT!"); 
     }
 }
