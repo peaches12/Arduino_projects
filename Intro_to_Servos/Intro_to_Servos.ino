@@ -91,7 +91,7 @@ void loop()
         delay(15);
     }
 }
-//see if the button was pressed twice or if it was just a debounce
+//see if the button was pressed more than once or if it was just a debounce
 boolean debounceButton(boolean state)
 {
     boolean stateNow = digitalRead(btnPin);
