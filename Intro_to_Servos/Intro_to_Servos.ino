@@ -1,23 +1,8 @@
-/*
- * Tutorial 6a: Introduction to Servo Motors
- * 
- * Simply rotates your server from 0 to 180 degrees and back.
- *
- * The circuit:
- * - Brown pin to ground
- * - Red pin to 5v
- * - Orange pin to digital pin 9
- *
- * by BARRAGAN <http://barraganstudio.com>
- * modified 14 August 2013
- * by Blaise Jarrett
- *
- * This example code is in the public domain.
- *
- * Derivative work from:
- * http://arduino.cc/en/Tutorial/Sweep
- *
- */
+/* Gun Project
+*  Turn the potentiometer to turn the servo motor ('gun'). 
+*  Press the button hard
+*  Arduino measures distance w/ ultrasonic range finder & calculates how long a 'bullet' will take to hit nearest 
+*  object from gun. */
 
 #include <Servo.h> 
 
@@ -37,6 +22,8 @@ int echoPin = 7;
 int trigPin = 8;
  
 const int Interval[3] = {3, 2, 1};
+
+boolean buttonState = HIGH;
 void setup() 
 {
     Serial.begin(9600); //monitor control
@@ -56,9 +43,31 @@ void setup()
 void loop()
 {
     int analogValue, pushed, LEDSLIGHT;
-    pushed = digitalRead(btnPin);
-    
-    if (pushed == HIGH) //aka if btn is not pushed
+    if(debounceButton(buttonState) == LOW && buttonState == HIGH) //aka if btn is pushed
+    {
+        int pulseLenMS, LED_delay, countdown_time;
+        float seconds, milliseconds, distance_ft;
+        //find distance in cm.
+        digitalWrite(trigPin, LOW);
+        delayMicroseconds(20);
+        digitalWrite(trigPin, HIGH);
+        delayMicroseconds(100);
+        digitalWrite(trigPin, LOW);
+        
+        pulseLenMS = pulseIn(echoPin, HIGH);
+        
+        distance_ft = pulseLenMS/29.387/2; //raw measurement in cm.--in this program cm=ft
+        seconds = distance_ft/10; //converting ft. to seconds 
+        milliseconds = seconds*1000; //converting secs. to millisecs.
+        Serial.print("Distance: ");
+        Serial.println(distance_ft);
+        Serial.print("Time to hit: "); //print time
+        Serial.print(seconds);
+        Serial.println(" seconds.");
+        delay(milliseconds);
+        Serial.println("TARGET HIT!"); 
+    }
+    else //aka if btn is not pushed
     {
         int potValue, position;
         potValue = analogRead(Potpin);
@@ -79,28 +88,15 @@ void loop()
         }
         delay(15);
     }
-    else //aka if btn is pushed
+}
+//see if the button was pressed twice or if it was just a debounce
+boolean debounceButton(boolean state)
+{
+    boolean stateNow = digitalRead(btnPin);
+    if(state != stateNow)
     {
-        int distance_ft, pulseLenMS, LED_delay, countdown_time;
-        float seconds, milliseconds;
-        //find distance in cm.
-        digitalWrite(trigPin, LOW);
-        delayMicroseconds(20);
-        digitalWrite(trigPin, HIGH);
-        delayMicroseconds(100);
-        digitalWrite(trigPin, LOW);
-        
-        pulseLenMS = pulseIn(echoPin, HIGH);
-        
-        distance_ft = pulseLenMS/29.387/2; //raw measurement in cm.--in this program cm=ft
-        seconds = distance_ft/10; //converting ft. to seconds 
-        milliseconds = seconds*1000; //converting secs. to millisecs.
-        Serial.print("Distance: ");
-        Serial.println(distance_ft);
-        Serial.print("Time to hit: "); //print time
-        Serial.print(seconds);
-        Serial.println(" seconds.");
-        delay(seconds);
-        Serial.println("TARGET HIT!"); 
+        delay(200);
+        stateNow = digitalRead(btnPin);
     }
+    return stateNow;
 }
