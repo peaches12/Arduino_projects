@@ -2,7 +2,8 @@
 *  Turn the potentiometer to turn the servo motor ('gun'). 
 *  Press the button hard
 *  Arduino measures distance w/ ultrasonic range finder & calculates how long a 'bullet' will take to hit nearest 
-*  object from gun. */
+*  object from gun. 
+*  Special thanks 2 educ8s.tv for the debounce video! */
 
 #include <Servo.h> 
 
@@ -60,7 +61,8 @@ void loop()
         seconds = distance_ft/10; //converting ft. to seconds 
         milliseconds = seconds*1000; //converting secs. to millisecs.
         Serial.print("Distance: ");
-        Serial.println(distance_ft);
+        Serial.print(distance_ft);
+        Serial.println(" cm.");
         Serial.print("Time to hit: "); //print time
         Serial.print(seconds);
         Serial.println(" seconds.");
@@ -71,7 +73,7 @@ void loop()
     {
         int potValue, position;
         potValue = analogRead(Potpin);
-        position = map(potValue, 0, 1023, 0, 179);
+        position = map(potValue, 0, 1022, 0, 179);
         MYSERVO.write(position);
         LEDSLIGHT = map(position, 0, 179, 0, 7); //sort of like a bar graph with LEDS
         //turn all the lights off
