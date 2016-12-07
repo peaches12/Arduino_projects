@@ -1,23 +1,11 @@
 /*
- * Tutorial 7a: Introduction to Stepper Motors
- * 
- * Simply rotates your stepper from 360 degrees forward
- * and back.
- *
- * The circuit:
- * - Stepper driver powered with 5v, GND
- * - D8-D11 connected to IN1-IN4 on the stepper driver
- *
- * by Blaise Jarrett
- *
- * This example code is in the public domain.
- *
- *
+What you need: 2 buttons, 1 LCD screen, 1 potentiometer, 1 Stepper Motor
+What it does: Press the buttons to increase/decrease speed of the motor. Speed is printed on the LCD screen.
  */
 
 #include <Stepper.h>
 #include <LiquidCrystal.h>
-int stepIN1Pin = 6;
+int stepIN1Pin = 13;
 int stepIN2Pin = 7;
 int stepIN3Pin = 8;
 int stepIN4Pin = 9;
@@ -30,56 +18,80 @@ Stepper myStepper(stepsPerRevolution,
                   
 LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 
-int increaseBtn = 9;
+int increaseBtn = 10;
 boolean iBState = HIGH;
-int decreaseBtn = 13;
+int decreaseBtn = 6;
 boolean dBState = HIGH;
 
-float motor_speed = 0.0;
+int motor_speed = 6;
 
-int max_speed = 10;
-int min_speed = 0;
+int max_speed = 12;
+int min_speed = 4;
 void setup()
 {
+    Serial.begin(9600);
     // set the RPM
     myStepper.setSpeed(motor_speed);
     pinMode(increaseBtn, INPUT_PULLUP);
     pinMode(decreaseBtn, INPUT_PULLUP);
     lcd.begin(16, 2);
+    lcd.setCursor(0, 0);
+    lcd.print("Speed:        ");
 }
 
 void loop()
 {
-    if(debounceButton(dBState, decreaseBtn) == LOW && dBState == HIGH) //aka if btn is pushed
+    
+    if(debounceDB(dBState) == LOW && dBState == HIGH) //aka if btn is pushed
     {
-        if (motor_speed > 0.5)
+        if (motor_speed > min_speed)
         {
-            motor_speed = motor_speed - 0.5;
+            motor_speed = motor_speed - 1;
+        }
+        else
+        {
+            //do nothing
         }
         
     }
-    if(debounceButton(iBState, increaseBtn) == LOW && iBState == HIGH) //aka if other btn is pushed
+    if(debounceIB(iBState) == LOW && iBState == HIGH) //aka if other btn is pushed
     {
-        if (motor_speed < 10)
+        if (motor_speed < max_speed)
         {
-            motor_speed = motor_speed + 0.5;
+            motor_speed = motor_speed + 1;
         }
-    }
-    lcd.setCursor(0, 0);
-    lcd.print("Speed: ");
+        else
+        {
+            //do nothing
+        }
+    } 
+
     lcd.setCursor(0, 7);
     lcd.print(motor_speed);
+    lcd.print(" ");
     myStepper.setSpeed(motor_speed);
-    myStepper.step(stepsPerRevolution);
+    myStepper.step(stepsPerRevolution/8);
+
 }
 
-boolean debounceButton(boolean state, int btn)
+boolean debounceDB(boolean DBSTATE)
 {
-    boolean stateNow = digitalRead(btn);
-    if(state != stateNow)
+    boolean Nowstate = digitalRead(decreaseBtn);
+    if(DBSTATE != Nowstate)
     {
         delay(200);
-        stateNow = digitalRead(btn);
+        Nowstate = digitalRead(decreaseBtn);
     }
-    return stateNow;
+    return Nowstate;
 } 
+boolean debounceIB(boolean State)
+{
+    boolean StateNow = digitalRead(increaseBtn);
+    if(State != StateNow)
+    {
+        delay(200);
+        StateNow = digitalRead(increaseBtn);
+    }
+    return StateNow;
+} 
+
