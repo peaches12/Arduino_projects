@@ -37,10 +37,10 @@ boolean STAET = HIGH;
 //LCD
 LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 //LEDS
-int greenLed = 10;
-int redLed = 9;
+const int greenLed = 10;
+const int redLed = 9;
 //password
-char* password = "9";
+char* password = "trigonometry";
 void setup()
 {
     // set up serial
@@ -55,14 +55,15 @@ void setup()
     pinMode(btnPin, INPUT_PULLUP);
     //Serial
     Serial.begin(9600);
-    
+    digitalWrite(greenLed, HIGH);
+    digitalWrite(redLed, LOW);
 }
 
 void loop()
 {
     if(debounce(STAET) == LOW && STAET == HIGH) //aka btn pressed
     {
-        float distanceCentimeters;
+        int distanceCentimeters;
         int pulseLenMicroseconds;
         while (1 == 1) //forever loop
         {
@@ -80,32 +81,36 @@ void loop()
 
             // calculate the distance using the speed of sound
             distanceCentimeters = pulseLenMicroseconds / 29.387 / 2;
-
+            Serial.println(distanceCentimeters);
             // print it on LCD
-            lcd.setCursor(0, 0);
+            lcd.clear();
+            lcd.setCursor(0, 1);
             lcd.print(distanceCentimeters);
-            lcd.print(" cm")
-            delay(100);
-            if(distanceCentimeters < 30);
+            lcd.print(" cm");
+            delay(2000);
+            if(distanceCentimeters > 100)
             {
                 digitalWrite(greenLed, LOW); //green OFF
                 digitalWrite(redLed, HIGH);  //red ON
-                lcd.clear();
                 lcd.setCursor(0, 0);
                 lcd.print("PASSWORD: ");
                 while (1 == 1) //forever
+                {
                     if(Serial.available() > 0)
                     {
                         int typed_password = Serial.read();
+                        int red = 9;
+                        int green = 10;
                         if (typed_password == password) //if password is correct
                         {
-                            digitalWrite(redLED, LOW);
-                            digitalWrite(greenLed, HIGH);
+                            digitalWrite(red, LOW);
+                            digitalWrite(green, HIGH);
                             lcd.clear();
                             lcd.print("You may enter");
                         }
                         else
                         {
+                            lcd.setCursor(0, 0);
                             lcd.print("Incorrect.");    
                         }
                     }
@@ -113,12 +118,14 @@ void loop()
                     {
                         //do nothing
                     }
-            }
+                }
+            }              
         }
+    }  
     else
     {
         //do nothing
-    }
+    }        
 }
 boolean debounce(boolean State)
 {
