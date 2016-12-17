@@ -1,4 +1,7 @@
-
+/*press the btn to start the program.
+  when the distance is <10, you must enter a password into the serial monitor
+  if password is wrong, you may retry as many times as you like
+  if password is right, you have 4 secs. to 'enter' and then you must press btn again to restart */
 
 //all the 'includes'
 #include <LiquidCrystal.h>
@@ -28,14 +31,16 @@ void setup()
     // set the BTN
     pinMode(btnPin, INPUT_PULLUP);
     // set the LEDs
-    digitalWrite(greenLed, HIGH);
-    digitalWrite(redLed, LOW);
+    pinMode(greenLed, OUTPUT);
+    pinMode(redLed, OUTPUT);
 }
 
 void loop()
 {
     if(debounce(STAET) == LOW && STAET == HIGH) //aka btn pressed
     {
+        digitalWrite(greenLed, HIGH);
+        digitalWrite(redLed, LOW);
         int distanceCentimeters;
         int pulseLenMicroseconds;
         while (1 == 1) //forever loop
@@ -60,7 +65,7 @@ void loop()
             lcd.print(distanceCentimeters);
             lcd.print(" cm");
             delay(2000);
-            if(distanceCentimeters < 100)
+            if(distanceCentimeters < 10)
             {
                 digitalWrite(greenLed, LOW); //green OFF
                 digitalWrite(redLed, HIGH);  //red ON
@@ -74,11 +79,13 @@ void loop()
                         
                         if(typed_password == 't')
                         {
+                            digitalWrite(greenLed, HIGH);
+                            digitalWrite(redLed, LOW);
                             lcd.clear();
                             lcd.setCursor(0, 0);
-                            Serial.println("Case");
-                            Serial.println(typed_password);
                             lcd.print("You may enter");
+                            delay(4000);
+                            software_Reset();
                         }
                         else
                         {
@@ -86,8 +93,6 @@ void loop()
                             lcd.print("You are wrong.");
                             lcd.setCursor(0, 1);
                             lcd.print("Try again:");
-                            Serial.println("Default");
-                            Serial.println(typed_password);
                         }
                     }
                 }
@@ -96,10 +101,10 @@ void loop()
     }  
     else
     {
-        //do nothing
+        digitalWrite(greenLed, LOW);
     }        
 }
-boolean debounce(boolean State)
+boolean debounce(boolean State) //make sure btn is pressed ONCE
 {
     boolean stateNow = digitalRead(btnPin);
     if (stateNow != State)
@@ -108,4 +113,9 @@ boolean debounce(boolean State)
         stateNow = digitalRead(btnPin);
     }
     return stateNow;
+}
+
+void software_Reset() //restart program without pressing the button
+{
+    asm volatile ("  jmp 0");
 }
