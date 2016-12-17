@@ -1,30 +1,4 @@
-/*
- * Tutorial 5: Ultrasonic Range Finder
- * 
- * Prints the distance measured from the
- * range finder over serial. Place the board on your desk
- * and open up the serial monitor. Move an object in front of the
- * ultrasonic sensor and you'll see the distance to the object
- * printed out over serial.
- *
- * The circuit:
- * - 5v, ground connected to Ultrasonic sensor
- * - digital pin 4 conneceted to Ultrasonic sensor echo pin
- * - digital pin 5 conneceted to Ultrasonic sensor trig pin
- *
- * created 3 Nov 2008
- * by David A. Mellis
- * modified 30 Aug 2011
- * by Tom Igoe
- * modified 14 August 2013
- * by Blaise Jarrett
- *
- * This example code is in the public domain.
- *
- * Derivative work from:
- * http://www.arduino.cc/en/Tutorial/Ping
- *
- */
+
 
 //all the 'includes'
 #include <LiquidCrystal.h>
@@ -40,7 +14,7 @@ LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
 const int greenLed = 10;
 const int redLed = 9;
 //password
-char* password = "trigonometry";
+int password = 56787;
 void setup()
 {
     // set up serial
@@ -53,8 +27,7 @@ void setup()
     lcd.clear(); //erase everything
     // set the BTN
     pinMode(btnPin, INPUT_PULLUP);
-    //Serial
-    Serial.begin(9600);
+    // set the LEDs
     digitalWrite(greenLed, HIGH);
     digitalWrite(redLed, LOW);
 }
@@ -81,14 +54,13 @@ void loop()
 
             // calculate the distance using the speed of sound
             distanceCentimeters = pulseLenMicroseconds / 29.387 / 2;
-            Serial.println(distanceCentimeters);
             // print it on LCD
             lcd.clear();
             lcd.setCursor(0, 1);
             lcd.print(distanceCentimeters);
             lcd.print(" cm");
             delay(2000);
-            if(distanceCentimeters > 100)
+            if(distanceCentimeters < 100)
             {
                 digitalWrite(greenLed, LOW); //green OFF
                 digitalWrite(redLed, HIGH);  //red ON
@@ -98,25 +70,25 @@ void loop()
                 {
                     if(Serial.available() > 0)
                     {
-                        int typed_password = Serial.read();
-                        int red = 9;
-                        int green = 10;
-                        if (typed_password == password) //if password is correct
+                        int typed_password = Serial.read(); //read character over serial
+                        
+                        if(typed_password == 't')
                         {
-                            digitalWrite(red, LOW);
-                            digitalWrite(green, HIGH);
                             lcd.clear();
+                            lcd.setCursor(0, 0);
+                            Serial.println("Case");
+                            Serial.println(typed_password);
                             lcd.print("You may enter");
                         }
                         else
                         {
                             lcd.setCursor(0, 0);
-                            lcd.print("Incorrect.");    
+                            lcd.print("You are wrong.");
+                            lcd.setCursor(0, 1);
+                            lcd.print("Try again:");
+                            Serial.println("Default");
+                            Serial.println(typed_password);
                         }
-                    }
-                    else
-                    {
-                        //do nothing
                     }
                 }
             }              
