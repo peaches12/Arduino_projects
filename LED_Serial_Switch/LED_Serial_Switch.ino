@@ -25,13 +25,13 @@ void setup()
     Serial.begin(9600);
 }
 
-int loop_btn, led_num, led_state;
+int loop_btn, led_num, led_state, cur_led;
 void loop()
 {
     for(int k = 0; k < 5; k++)
     {
         loop_btn = btn[k];
-        if(debounce(loop_btn) == LOW)
+        if(debounce(STAET) == LOW)
         {
             Serial.print("Button: ");
             Serial.println(loop_btn);
